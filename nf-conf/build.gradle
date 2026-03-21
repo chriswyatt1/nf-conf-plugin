@@ -5,13 +5,12 @@ plugins {
 version = '0.1.0'
 
 nextflowPlugin {
-    nextflowVersion = '24.10.0'
+    nextflowVersion = '25.04.8'
 
     provider = 'ecoflow'
-    className = 'ecoflow.plugin.NfConfPlugin'
+    className = 'ecoflow.conf.NfConfPlugin'
     extensionPoints = [
-        'ecoflow.plugin.NfConfExtension',
-        'ecoflow.plugin.NfConfFactory'
+        'ecoflow.conf.NfConfObserverFactory'
     ]
 
     publishing {

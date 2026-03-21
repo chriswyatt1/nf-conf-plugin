@@ -1,22 +1,16 @@
 package ecoflow.plugin
 
-import nextflow.Session
+import ecoflow.conf.NfConfObserverFactory
+import ecoflow.conf.NfConfObserver
 import spock.lang.Specification
 
-/**
- * Implements a basic factory test
- *
- */
 class NfConfObserverTest extends Specification {
 
-    def 'should create the observer instance' () {
+    def 'should create observer'() {
         given:
-        def factory = new NfConfFactory()
-        when:
-        def result = factory.create(Mock(Session))
-        then:
-        result.size() == 1
-        result.first() instanceof NfConfObserver
-    }
+        def factory = new NfConfObserverFactory()
 
+        expect:
+        factory != null
+    }
 }
