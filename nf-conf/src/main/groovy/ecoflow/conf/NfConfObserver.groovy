@@ -23,7 +23,7 @@ class NfConfObserver implements TraceObserver {
 
     void generateReport() {
         def config = session.config
-        def outdir = session.config.navigate('params.outdir') ?: '.'
+        def outdir = session.config.navigate('params.outdir')?.toString() ?: '.'
         def reportFile = new File("${outdir}/pipeline_info/config_report.html")
         reportFile.parentFile.mkdirs()
 
@@ -78,7 +78,7 @@ class NfConfObserver implements TraceObserver {
         sb << "<h2>Parameters</h2>"
         sb << "<table><tr><th>Parameter</th><th>Value</th></tr>"
         params.sort().each { k, v ->
-            sb << "<tr><td><code>--${k}</code></td><td>${v}</td></tr>"
+            sb << "<tr><td><code>--${k}</code></td><td>${v?.toString()}</td></tr>"
         }
         sb << "</table></div>"
 
