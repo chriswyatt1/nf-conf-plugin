@@ -4,15 +4,20 @@ plugins {
 
 version = '0.1.0'
 
+// Force Java 17 instead of 21
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 nextflowPlugin {
     nextflowVersion = '25.04.8'
-
     provider = 'ecoflow'
     className = 'ecoflow.conf.NfConfPlugin'
     extensionPoints = [
         'ecoflow.conf.NfConfObserverFactory'
     ]
-
     publishing {
         registry {
             url = 'https://nf-plugins-registry.dev-tower.net/api'

@@ -1,12 +1,10 @@
 package ecoflow.conf
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import nextflow.Session
 import nextflow.trace.TraceObserver
 
 @Slf4j
-@CompileStatic
 class NfConfObserver implements TraceObserver {
 
     private Session session
@@ -22,20 +20,22 @@ class NfConfObserver implements TraceObserver {
     }
 
     void generateReport() {
-        def config = session.config
-        def outdir = session.config.navigate('params.outdir')?.toString() ?: '.'
-        def reportFile = new File("${outdir}/pipeline_info/config_report.html")
-        reportFile.parentFile.mkdirs()
-
-        def configFiles = session.configFiles ?: []
-        def processConfig = config.navigate('process') as Map ?: [:]
-        def params = config.navigate('params') as Map ?: [:]
-
-        def html = buildHtmlReport(configFiles, processConfig, params)
-        reportFile.text = html
-
-        log.info "nf-conf: Config report written to ${reportFile}"
-        println "nf-conf: Config report written to → ${reportFile}"
+        try {
+            def config = session.config
+            def outdir = session.config.navigate('params.outdir')?.toString() ?: '.'
+            def reportFile = new File("${outdir}/pipeline_info/config_report.html")
+            reportFile.parentFile.mkdirs()
+            def configFiles = session.configFiles ?: []
+            def processConfig = config.navigate('process') as Map ?: [:]
+            def params = config.navigate('params') as Map ?: [:]
+            def html = buildHtmlReport(configFiles, processConfig, params)
+            reportFile.text = html
+            log.info "nf-conf: Config report written to ${reportFile}"
+            println "nf-conf: Config report written to --> ${reportFile}"
+        } catch (Exception e) {
+            log.error "nf-conf: Failed to generate config report: ${e.message}"
+            e.printStackTrace()
+        }
     }
 
     String buildHtmlReport(List configFiles, Map processConfig, Map params) {
@@ -78,7 +78,8 @@ class NfConfObserver implements TraceObserver {
         sb << "<h2>Parameters</h2>"
         sb << "<table><tr><th>Parameter</th><th>Value</th></tr>"
         params.sort().each { k, v ->
-            sb << "<tr><td><code>--${k}</code></td><td>${v?.toString()}</td></tr>"
+            def safeVal = v instanceof Map ? '{...}' : v?.toString() ?: 'null'
+            sb << "<tr><td><code>--${k}</code></td><td>${safeVal}</td></tr>"
         }
         sb << "</table></div>"
 
@@ -89,7 +90,8 @@ class NfConfObserver implements TraceObserver {
         sb << "<table><tr><th>Setting</th><th>Value</th></tr>"
         processConfig.each { k, v ->
             if (k != 'withName' && k != 'withLabel') {
-                sb << "<tr><td><code>${k}</code></td><td>${v}</td></tr>"
+                def safeVal = v instanceof Map ? '{...}' : v?.toString() ?: 'null'
+                sb << "<tr><td><code>${k}</code></td><td>${safeVal}</td></tr>"
             }
         }
         sb << "</table>"
@@ -102,7 +104,8 @@ class NfConfObserver implements TraceObserver {
             withLabel.each { label, settings ->
                 if (settings instanceof Map) {
                     settings.each { k, v ->
-                        sb << "<tr><td><code>${label}</code></td><td><code>${k}</code></td><td>${v}</td></tr>"
+                        def safeVal = v instanceof Map ? '{...}' : v?.toString() ?: 'null'
+                        sb << "<tr><td><code>${label}</code></td><td><code>${k}</code></td><td>${safeVal}</td></tr>"
                     }
                 }
             }
@@ -117,7 +120,8 @@ class NfConfObserver implements TraceObserver {
             withName.each { procName, settings ->
                 if (settings instanceof Map) {
                     settings.each { k, v ->
-                        sb << "<tr><td><code>${procName}</code></td><td><code>${k}</code></td><td>${v}</td></tr>"
+                        def safeVal = v instanceof Map ? '{...}' : v?.toString() ?: 'null'
+                        sb << "<tr><td><code>${procName}</code></td><td><code>${k}</code></td><td>${safeVal}</td></tr>"
                     }
                 }
             }
